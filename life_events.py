@@ -1,74 +1,60 @@
-def married(scott, result)
-    buff = 0 
-    if(self.focus == 'relationships')
-        buff = 2
-
-    Pass = [
-    happiness = 2
-    savings = -20000
-    charisma = 1
-    ]
-
-    Suceed = [
-
-
-    ]
-
-    Fail = [
-
-
-    ]
-
+def format_result(result):  
+    """Convert a result dict to a readable string."""  
+    if not result:  
+        return "No effect"  
+    parts = []  
+    for stat, value in result.items():  
+        sign = "+" if value >= 0 else ""  
+        unit = "$" if stat == "savings" else ""  
+        parts.append(f"{sign}{unit}{value:,} {stat}")  
+    return ", ".join(parts)  
   
-def married(sott):
-    
-    
-
-
-def fail_married(scott):  
-    pass  # TODO: implement  
   
-def pass_get_sick(scott):  
-    pass  # TODO: implement  
-  
-def fail_get_sick(scott):  
-    pass  # TODO: implement  
+def apply_result(scott, result):  
+    """Apply a result dict to scott's scores and stats."""  
+    for stat, value in result.items():  
+        if stat in scott.scores:  
+            scott.scores[stat] += value  
+        elif stat in scott.stats:  
+            scott.stats[stat] += value  
+        elif stat == "savings":  
+            scott.savings += value  
   
   
 life_events = [  
     {  
-        'description': "Get married",  
-        'optional': True,  
-        'requires': 15,  
-        'type': 'relationship'
-        'pass_text': pass_married(False)
-        'suceed_text': succeed_married(False)
-        'fail_text': "-1 relationships"
-        'bonus': 'relationship',  
-        'pass_result': pass_married,  
-        'succeed_result': succeed_married(True),
-        'fail_result': fail_married(True),  
-    }, 
+        "description": "Get Married",  
+        "optional":    True,  
+        "requires":    15,  
+        "type":        "relationships",  
+        "buff_stat":   "charisma",  
+        "results": {  
+            "pass":    {},  
+            "succeed": {"happiness": 2, "savings": -20000, "charisma": 1},  
+            "fail":    {"relationships": -1},  
+        },  
+    },  
     {  
-        'description': "Run Half Marathon",  
-        'optional': True,  
-        'requires': 6,  
-        'pass_text': "No effect"
-        'suceed_text': "+2 happiness, +1 fitness, -10 time"
-        'fail_text': "-1 fitness, gets injured"
-        'bonus': 'fitness',  
-        'pass_result': pass_halfmarathon,  
-        'succeed_result': suceed_halfmarathon,
-        'fail_result': fail_halfmarathon,  
-    }, 
-
-
+        "description": "Run a Half Marathon",  
+        "optional":    True,  
+        "requires":    6,  
+        "type":        "health",  
+        "buff_stat":   "fitness",  
+        "results": {  
+            "pass":    {},  
+            "succeed": {"happiness": 2, "fitness": 1, "time": -1},  
+            "fail":    {"fitness": -1, "health": -1},  
+        },  
+    },  
     {  
-        'description': "Get sick",  
-        'optional': False,  
-        'requires': 0,  
-        'bonus': 'health',  
-        'pass_result': pass_get_sick,  
-        'fail_result': fail_get_sick,  
+        "description": "Get Sick",  
+        "optional":    False,  
+        "requires":    8,  
+        "type":        "health",  
+        "buff_stat":   "fitness",  
+        "results": {  
+            "succeed": {"health": -1},  
+            "fail":    {"health": -3, "savings": -5000},  
+        },  
     },  
 ]

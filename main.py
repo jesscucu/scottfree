@@ -11,6 +11,7 @@ class Scott:
     def __init__(self):
         self.age     = 30
         self.focus   = None
+        self.choices = 3
         self.savings = 100000
 
         self.scores = {
@@ -77,13 +78,15 @@ class Scott:
 
     def print_event(self, event):
         print(SEP)
-        tag = "[OPTIONAL]" if event["optional"] else "[MANDATORY]"
-        print(f"  {tag}  {event['description']}")
+        print(f" {event['description']}")
         buff_stat  = event.get("buff_stat", "")
         buff_value = self.stats.get(buff_stat, 0)
         focus_bonus = 2 if self.focus == event.get("type") else 0
         bonus_str = f"  |  Focus bonus: +{focus_bonus}" if focus_bonus else ""
-        print(f"  Requires: {event['requires']}  |  Buff: +{buff_value} ({buff_stat}){bonus_str}")
+        if(buff_stat== ""):
+            print(f"  Requires: {event['requires']}{bonus_str}")
+        else: 
+            print(f"  Requires: {event['requires']}  |  Buff: +{buff_value} ({buff_stat}){bonus_str}")
         results = event.get("results", {})
         if event["optional"]:
             print(f"  Skip:     {format_result(results.get('pass', {}))}")
@@ -105,7 +108,7 @@ class Scott:
         print("  Stock prices rise and fall each year -- you can lose money!")
         print()
         print("  Every event you roll a D20 + buffered stat to determine success or failure")
-        print("  Sucess: (roll + buff) >= required;    Fail: (roll + buff) < required")
+        print("  Sucess: (roll + buff + luck) >= required;    Fail: (roll + buff + luck) < required")
         print()
         print("  At the start of the game you get to choose your life focus")
         print("  Focus increases the probability of receiving those events and changes your starting buffs")
@@ -159,6 +162,7 @@ class Scott:
                 self.focus = "pursuits"
                 self.stats["time"] += 2
                 self.stats["intelligence"] += 2
+                self.choices += 1
                 break
             else:
                 print("  Please enter 1, 2, or 3.")
@@ -171,19 +175,22 @@ class Scott:
     # ------------------------------------------------------------------ #
 
     def roll_for_event(self, event):
-        """Roll 1d20 + buff stat + focus bonus. Return breakdown and total."""
+        """Roll 1d20 + buff stat + focus bonus + luck. Return breakdown and total."""
         roll        = random.randint(1, 20)
         buff_stat   = event.get("buff_stat", "")
         buff        = self.stats.get(buff_stat, 0)
         focus_bonus = 2 if self.focus == event.get("type") else 0
-        total       = roll + buff + focus_bonus
+        total       = roll + buff + focus_bonus + self.stats["luck"]
         return roll, buff, buff_stat, focus_bonus, total
 
     def resolve_event(self, event):
         roll, buff, buff_stat, focus_bonus, total = self.roll_for_event(event)
         print(f"\n  Rolling for: {event['description']}")
+        luck = self.stats["luck"]
+        luck_str = f" + {luck} (luck)"
         focus_str = f" + {focus_bonus} (focus)" if focus_bonus else ""
-        print(f"  Roll: {roll} + {buff} ({buff_stat}){focus_str} = {total}  (need {event['requires']})")
+        buff_str =  f" + {buff} ({buff_stat})" if buff_stat else ""
+        print(f"  Roll: {roll}{luck_str}{buff_str}{focus_str} = {total}  (need {event['requires']})")
 
         results = event.get("results", {})
         if total >= event["requires"]:
@@ -311,42 +318,24 @@ class Scott:
         print(WIDE)
 
         optional  = [e for e in life_events if e["optional"]]
-        mandatory = [e for e in life_events if not e["optional"]]
+        accepted = 0
 
-        max_choices = self.stats["time"] + (1 if self.focus == "pursuits" else 0)
-        print(f"\n  You have {max_choices} time slot(s) this year.")
-        print("  Optional events available:\n")
-        for i, event in enumerate(optional, 1):
-            print(f"  [{i}]", end=" ")
-            self.print_event(event)
-        print("  [0] Done choosing\n")
+        for i in range(1, self.choices+1):  
+            event = random.choice(optional)  
+            print(f"  [{i}]", end=" ")  
+            self.print_event(event)  
 
-        chosen = []
-        while len(chosen) < max_choices:
-            slots_left = max_choices - len(chosen)
-            choice = input(f"  Choose event ({slots_left} slot(s) left, 0 to stop): ").strip()
-            if choice == "0":
-                break
-            try:
-                idx = int(choice) - 1
-                if not (0 <= idx < len(optional)):
-                    print("  Invalid number.")
-                elif optional[idx] in chosen:
-                    print("  Already chosen.")
-                else:
-                    chosen.append(optional[idx])
-                    print(f"  Added: {optional[idx]['description']}")
-            except ValueError:
-                print("  Invalid input.")
-
-        for event in chosen:
-            self.resolve_event(event)
-
-        if mandatory:
-            print("\n  Drawing mandatory event...")
-            event = random.choice(mandatory)
-            print(f"  You drew: {event['description']}")
-            self.resolve_event(event)
+            choice = "Y"
+            if(accepted==0 and i==self.choices):
+                print("  Automatically accepting event...")
+            else:
+                choice = input(f"  Accept event [{i}]? (type Y for yes, N for no) ").strip()  
+            if choice == "Y":  
+                accepted +=1
+                print()
+                self.resolve_event(event)
+            print()
+            print()
 
     def process_global_events(self):
         pass  # TODO: implement

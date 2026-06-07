@@ -1,4 +1,5 @@
 import random  
+import time
 from life_events import life_events, format_result, apply_result  
 # from global_events import global_events  
 
@@ -13,6 +14,7 @@ class Scott:
         self.focus   = None
         self.choices = 3
         self.savings = 100000
+        self.completed_events = set()
 
         self.scores = {
             "relationships": 0,
@@ -23,11 +25,11 @@ class Scott:
 
         self.stats = {
             "income":       20000,
-            "luck":         4,
-            "charisma":     2,
-            "fitness":      2,
-            "time":         3,
-            "intelligence": 4,
+            "luck":         0,
+            "charisma":     0,
+            "fitness":      0,
+            "time":         0,
+            "intelligence": 0,
         }
 
         # Fixed investments: {"type": "fixed", "initial_value": int, "interest_rate": float, "lock_in_years": int, "current_year": int}
@@ -186,21 +188,27 @@ class Scott:
     def resolve_event(self, event):
         roll, buff, buff_stat, focus_bonus, total = self.roll_for_event(event)
         print(f"\n  Rolling for: {event['description']}")
+        time.sleep(0.2)
         luck = self.stats["luck"]
         luck_str = f" + {luck} (luck)"
         focus_str = f" + {focus_bonus} (focus)" if focus_bonus else ""
         buff_str =  f" + {buff} ({buff_stat})" if buff_stat else ""
         print(f"  Roll: {roll}{luck_str}{buff_str}{focus_str} = {total}  (need {event['requires']})")
+        time.sleep(1)
 
         results = event.get("results", {})
         if total >= event["requires"]:
             outcome = results.get("succeed", {})
             print(f"  SUCCESS!  {format_result(outcome)}")
+            time.sleep(2)
             apply_result(self, outcome)
+            return True
         else:
             outcome = results.get("fail", {})
             print(f"  FAILED.   {format_result(outcome)}")
+            time.sleep(2)
             apply_result(self, outcome)
+            return False
 
     # ------------------------------------------------------------------ #
     #  Turn phases                                                         #
@@ -317,23 +325,33 @@ class Scott:
         print("  LIFE EVENTS")
         print(WIDE)
 
-        optional  = [e for e in life_events if e["optional"]]
+        optional = [  
+            e for e in life_events  
+            if e["optional"] and e["description"] not in self.completed_events  
+        ]
         accepted = 0
 
         for i in range(1, self.choices+1):  
+            if not optional:  
+                break
             event = random.choice(optional)  
+            optional.remove(event)
             print(f"  [{i}]", end=" ")  
             self.print_event(event)  
 
             choice = "Y"
             if(accepted==0 and i==self.choices):
+                time.sleep(1)
                 print("  Automatically accepting event...")
+                time.sleep(1)
             else:
-                choice = input(f"  Accept event [{i}]? (type Y for yes, N for no) ").strip()  
+                choice = input(f"  Accept event [{i}]? (type Y for yes, N for no) ").strip() 
+                time.sleep(0.5) 
             if choice == "Y":  
                 accepted +=1
                 print()
-                self.resolve_event(event)
+                if(self.resolve_event(event)):
+                    self.completed_events.add(event["description"])
             print()
             print()
 

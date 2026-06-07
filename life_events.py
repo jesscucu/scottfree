@@ -16,10 +16,13 @@ def apply_result(scott, result):
         if stat in scott.scores:  
             scott.scores[stat] += value  
         elif stat in scott.stats:  
-            scott.stats[stat] += value  
+            scott.scores[stat] = min(6, scott.stats[stat] + value) 
         elif stat == "savings":  
             scott.savings += value  
-  
+
+def married(scott):  
+    scott.is_married = True   # or whatever side effect you need  
+    print("  You are now married!")  
   
 life_events = [  
     {  
@@ -33,6 +36,11 @@ life_events = [
             "succeed": {"happiness": 2, "savings": -30000, "charisma": 1},  
             "fail":    {"relationships": -1},  
         },  
+        "callbacks": {  
+            "succeed": married,   # reference, not married()  
+            "fail":    None,  
+            "pass":    None,  
+        }  
     },  
     {  
         "description": "Run a Half Marathon",  

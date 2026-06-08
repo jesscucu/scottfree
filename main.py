@@ -12,9 +12,10 @@ class Scott:
     def __init__(self):
         self.age     = 30
         self.focus   = None
-        self.choices = 3
+        self.choices = 2
         self.savings = 100000
         self.completed_events = set()
+        self.eventslots = [0, 0, 0, 0]
 
         self.scores = {
             "relationships": 0,
@@ -143,11 +144,11 @@ class Scott:
         print("  CHOOSE YOUR LIFE FOCUS")
         print(WIDE)
         print("  1. Relationships")
-        print("     +2 charisma | more relationship events | doubles relationships score\n")
+        print("     +2 charisma | doubles relationships score\n")
         print("  2. Career")
-        print("     +$20,000 income | more career events | doubles career score | -1 time\n")
+        print("     -1 time | +$20,000 income | doubles career score\n")
         print("  3. Pursuits")
-        print("     +2 time, +2 intelligence | doubles happiness score | 4 event choices/turn\n")
+        print("     +2 time, +2 intelligence | doubles happiness score | extra event choices/turn\n")
 
         while True:
             choice = input("  Enter 1, 2, or 3: ").strip()
@@ -320,7 +321,7 @@ class Scott:
                 except ValueError:
                     print("  Invalid input.")
 
-    def process_life_events(self):
+    def process_optional_events(self):
         print(WIDE)
         print("  LIFE EVENTS")
         print(WIDE)
@@ -332,6 +333,8 @@ class Scott:
         accepted = 0
 
         for i in range(1, self.choices+1):  
+            if(self.eventslots[i]>0):
+                continue
             if not optional:  
                 break
             event = random.choice(optional)  
@@ -352,6 +355,9 @@ class Scott:
                 print()
                 if(self.resolve_event(event)):
                     self.completed_events.add(event["description"])
+                    self.eventslots[i] = event["length"].get("succeed")
+                else: 
+                    self.eventslots[i] = event["length"].get("fail")
             print()
             print()
 
@@ -360,10 +366,12 @@ class Scott:
 
     def next_age(self):
         self.age += 1
+        for i in range(len(self.eventslots)):
+            self.eventslots[i] = max(0, self.eventslots[i] - 1)
         self.earn()
         self.buy_sell()
-        self.process_life_events()
-        self.process_global_events()
+        self.process_optional_events()
+        self.process_mandetory_events()
         self.print_stats()
 
     # ------------------------------------------------------------------ #

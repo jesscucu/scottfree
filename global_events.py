@@ -23,38 +23,95 @@ def apply_result(scott, result):
   
 global_events = [  
     {  
-        "description": "Get Married",  
-        "optional":    True,  
-        "requires":    15,  
-        "type":        "relationships",  
-        "buff_stat":   "charisma",  
-        "results": {  
-            "pass":    {},  
-            "succeed": {"happiness": 2, "savings": -20000, "charisma": 1},  
-            "fail":    {"relationships": -1},  
-        },  
-    },  
-    {  
-        "description": "Run a Half Marathon",  
-        "optional":    True,  
-        "requires":    6,  
-        "type":        "health",  
-        "buff_stat":   "fitness",  
-        "results": {  
-            "pass":    {},  
-            "succeed": {"happiness": 2, "fitness": 1, "time": -1},  
-            "fail":    {"fitness": -1, "health": -1},  
-        },  
-    },  
-    {  
         "description": "Get Sick",  
         "optional":    False,  
         "requires":    8,  
-        "type":        "health",  
-        "buff_stat":   "fitness",  
+        "type":        "",  
+        "buff_stat":   "luck",  
         "results": {  
-            "succeed": {"health": -1},  
-            "fail":    {"health": -3, "savings": -5000},  
+            "succeed": {},  
+            "fail":    {"health": -3},  
         },  
     },  
+    {  
+        "description": "Global Pandemic",  
+        "optional":    False,  
+        "requires":    18,  
+        "type":        "",  
+        "buff_stat":   "luck",  
+        "results": {  
+            "succeed": {"happiness": 5, "health": 3},  
+            "fail":    {"happiness": -3, "health": -3},  
+        },  
+    }, 
+    {  
+        "description": "Stock Market Crash",  
+        "optional":    False,  
+        "requires":    15,  
+        "type":        "career",  
+        "buff_stat":   "luck",  
+        "results": {  
+            "succeed": {},  
+            "fail":    {"savings": -10000},  
+        },  
+    }, 
+    {  
+        "description": "Canada invaded by US",  
+        "optional":    False,  
+        "requires":    8,  
+        "type":        "",  
+        "buff_stat":   "luck",  
+        "results": {  
+            "succeed": {},  
+            "fail":    {"happiness": -10},  
+        }, 
+    }, 
+    {  
+        "description": "Wins lottery",  
+        "optional":    False,  
+        "requires":    19,  
+        "type":        "",  
+        "buff_stat":   "luck",  
+        "results": {  
+            "succeed": {"savings": 1000000, "relationships": -4},  
+            "fail":    {},  
+        }, 
+    }, 
+    {  
+        "description": "Layoffs",  
+        "optional":    False,  
+        "requires":    12,  
+        "type":        "",  
+        "buff_stat":   "career",  
+        "results": {  
+            "succeed": {"career": 2},  
+            "fail":    {"income": -10000, "happiness": -4},  
+        }, 
+    }, 
+    {  
+        "description": "Becomes an uncle",  
+        "optional":    False,  
+        "requires":    3,  
+        "type":        "relationships",  
+        "buff_stat":   "relationships",  
+        "results": {  
+            "succeed": {"savings": -300, "time": -1, "happiness": 1},  
+            "fail":    {},  
+        }, 
+    }, 
+
+
+    Canada is invaded by US
+    Wins lottery
+    Looses his job
+    New job opprotunity 
+    Takes a surendered animal 
+    Sees Vupflack in concert
+    Vacation 
+    Builds a house
+    Become a landlord 
+    Becomes an unlce
+    Goes camping 
+    Takes up metalurgy 
+
 ]
